@@ -10,10 +10,9 @@
  * INCLUDE
  **************************************************************************************/
 
-#include <GL/freeglut.h>
-
-#include <thread>
 #include <memory>
+
+#include <gtkmm.h>
 
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -44,14 +43,11 @@ namespace t07
 class Node : public rclcpp::Node
 {
 public:
-   Node();
+   Node(int & argc, char ** argv);
   ~Node();
 
 private:
   std::thread _gui_thread;
-
-  void init_glut();
-  void deinit_glut();
 };
 
 /**************************************************************************************

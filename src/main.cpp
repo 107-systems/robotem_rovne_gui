@@ -16,12 +16,23 @@
  * MAIN
  **************************************************************************************/
 
-int main(int argc, char * argv[])
+class GuiWindow : public Gtk::Window
 {
-  glutInit(&argc, argv);
+public:
+  GuiWindow();
+};
+
+GuiWindow::GuiWindow()
+{
+  set_title("Robotem Rovne GUI");
+  set_default_size(320, 240);
+}
+
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<t07::Node>();
+  auto node = std::make_shared<t07::Node>(argc, argv);
 
   try
   {

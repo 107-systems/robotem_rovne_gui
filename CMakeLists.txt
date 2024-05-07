@@ -27,9 +27,12 @@ if(GLUT_FOUND)
   message ("GLUT_LIBRARIES: " ${GLUT_LIBRARIES})
 endif()
 #######################################################################################
+find_package(PkgConfig)
+pkg_check_modules(GTKMM gtkmm-3.0)
+#######################################################################################
 add_executable(${ROBOTEM_ROVNE_GUI_TARGET}
-  src/Node.cpp
-  src/main.cpp
+        src/Node.cpp
+        src/main.cpp
 )
 #######################################################################################
 target_include_directories(${ROBOTEM_ROVNE_GUI_TARGET} PRIVATE
@@ -37,6 +40,7 @@ target_include_directories(${ROBOTEM_ROVNE_GUI_TARGET} PRIVATE
         ${mp_units_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIRS}
         ${GLUT_INCLUDE_DIRS}
+        ${GTKMM_INCLUDE_DIRS}
 )
 #######################################################################################
 target_compile_features(${ROBOTEM_ROVNE_GUI_TARGET} PRIVATE cxx_std_20)
@@ -46,12 +50,12 @@ target_link_libraries(${ROBOTEM_ROVNE_GUI_TARGET}
         ${mp-units_LIBRARIES}
         ${OPENGL_LIBRARIES}
         ${GLUT_LIBRARIES}
+        ${GTKMM_LIBRARIES}
 )
 #######################################################################################
 ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs)
 #######################################################################################
 install(TARGETS ${ROBOTEM_ROVNE_GUI_TARGET} DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 #######################################################################################
 ament_package()
 #######################################################################################

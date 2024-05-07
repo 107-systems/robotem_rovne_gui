@@ -19,5 +19,5 @@ colcon build --packages-select robotem_rovne_gui
 ```bash
 cd $COLCON_WS
 . install/setup.bash
-ros2 launch robotem_rovne_gui gui.py
+ros2 run robotem_rovne_gui robotem_rovne_gui_node
 ```
