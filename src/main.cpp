@@ -18,6 +18,7 @@
 
 int main(int argc, char * argv[])
 {
+  glutInit(&argc, argv);
   rclcpp::init(argc, argv);
 
   auto node = std::make_shared<t07::Node>();

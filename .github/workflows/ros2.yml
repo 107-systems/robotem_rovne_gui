@@ -33,6 +33,9 @@ jobs:
     - name: Install mp-units
       uses: lxrobotics/install-mp-units@main
 
+    - name: Install FreeGLUT
+      uses: lxrobotics/install-freeglut@main
+
     - uses: ros-tooling/setup-ros@v0.7
       with:
         required-ros-distributions: ${{ matrix.ros_distro }}

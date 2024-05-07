@@ -10,6 +10,9 @@
  * INCLUDE
  **************************************************************************************/
 
+#include <GL/freeglut.h>
+
+#include <thread>
 #include <memory>
 
 #include <rclcpp/qos.hpp>
@@ -43,6 +46,12 @@ class Node : public rclcpp::Node
 public:
    Node();
   ~Node();
+
+private:
+  std::thread _gui_thread;
+
+  void init_glut();
+  void deinit_glut();
 };
 
 /**************************************************************************************
