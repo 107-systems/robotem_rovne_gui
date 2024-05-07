@@ -33,6 +33,14 @@ Node::Node(int & argc, char ** argv)
       window.set_title("Robotem Rovne GUI");
       window.set_default_size(320, 240);
 
+      Gtk::Button btn_start;
+      btn_start.set_label("Start");
+      btn_start.signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
+
+      window.add(btn_start);
+
+      window.show_all_children();
+
       return app->run(window);
     });
 
@@ -48,6 +56,11 @@ Node::~Node()
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
+
+void Node::btn_start_pressed()
+{
+  RCLCPP_INFO(get_logger(), "btn_start_pressed");
+}
 
 /**************************************************************************************
  * NAMESPACE
