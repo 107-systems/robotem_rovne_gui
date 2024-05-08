@@ -101,6 +101,7 @@
                       <object class="GtkEntry" id="entry_target_angle">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="placeholder-text" translatable="yes">0.0</property>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
