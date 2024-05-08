@@ -28,20 +28,31 @@ Node::Node(int & argc, char ** argv)
     [this, &argc, &argv]()
     {
       auto app = Gtk::Application::create(argc, argv, "");
+      auto builder = Gtk::Builder::create();
 
-      Gtk::Window window;
-      window.set_title("Robotem Rovne GUI");
-      window.set_default_size(320, 240);
+      try
+      {
+        builder->add_from_file("install/robotem_rovne_gui/share/robotem_rovne_gui/glade/robotem_rovne_gui.glade");
+      }
+      catch(const Glib::FileError& ex)
+      {
+        RCLCPP_ERROR(get_logger(), "FileError: %s", ex.what().c_str());
+        rclcpp::shutdown();
+      }
+      catch(const Glib::MarkupError& ex)
+      {
+        RCLCPP_ERROR(get_logger(), "MarkupError: %s", ex.what().c_str());
+        rclcpp::shutdown();
+      }
+      catch(const Gtk::BuilderError& ex)
+      {
+        RCLCPP_ERROR(get_logger(), "BuilderError: %s", ex.what().c_str());
+        rclcpp::shutdown();
+      }
 
-      Gtk::Button btn_start;
-      btn_start.set_label("Start");
-      btn_start.signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
-
-      window.add(btn_start);
-
-      window.show_all_children();
-
-      return app->run(window);
+      Gtk::Window * window = nullptr;
+      builder->get_widget("robotem_rovne_gui_window", window);
+      return app->run(*window);
     });
 
   RCLCPP_INFO(get_logger(), "%s init complete.", get_name());

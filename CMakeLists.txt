@@ -56,6 +56,7 @@ target_link_libraries(${ROBOTEM_ROVNE_GUI_TARGET}
 ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs)
 #######################################################################################
 install(TARGETS ${ROBOTEM_ROVNE_GUI_TARGET} DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY glade DESTINATION share/${PROJECT_NAME})
 #######################################################################################
 ament_package()
 #######################################################################################
