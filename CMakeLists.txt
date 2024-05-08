@@ -11,6 +11,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(mp-units REQUIRED)
 #######################################################################################
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -42,7 +43,7 @@ target_link_libraries(${ROBOTEM_ROVNE_GUI_TARGET}
         ${GTKMM_LIBRARIES}
 )
 #######################################################################################
-ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs)
+ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs std_srvs)
 #######################################################################################
 install(TARGETS ${ROBOTEM_ROVNE_GUI_TARGET} DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY glade DESTINATION share/${PROJECT_NAME})

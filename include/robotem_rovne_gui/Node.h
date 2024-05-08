@@ -17,7 +17,7 @@
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include <std_msgs/msg/float32.hpp>
+#include <std_srvs/srv/empty.hpp>
 
 #include <mp-units/systems/si/si.h>
 #include <mp-units/systems/angular/angular.h>
@@ -51,9 +51,18 @@ private:
   Glib::RefPtr<Gtk::Application> _gtk_app;
   Glib::RefPtr<Gtk::Builder> _gtk_builder;
   std::thread _gtk_thread;
+  void init_gtk();
 
   void btn_start_pressed();
+  rclcpp::Client<std_srvs::srv::Empty>::SharedPtr _req_start_service_client;
+  void init_req_start_service_client();
+  void request_start();
+
   void btn_stop_pressed();
+  rclcpp::Client<std_srvs::srv::Empty>::SharedPtr _req_stop_service_client;
+  void init_req_stop_service_client();
+  void request_stop();
+
   void btn_set_pressed();
 };
 
