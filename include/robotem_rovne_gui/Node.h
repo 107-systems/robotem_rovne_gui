@@ -54,6 +54,7 @@ private:
 
   void btn_start_pressed();
   void btn_stop_pressed();
+  void btn_set_pressed();
 };
 
 /**************************************************************************************

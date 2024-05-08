@@ -36,6 +36,10 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
   _gtk_builder->get_widget("btn_stop", btn_stop);
   btn_stop->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_stop_pressed));
 
+  Gtk::Button * btn_set = nullptr;
+  _gtk_builder->get_widget("btn_set", btn_set);
+  btn_set->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_set_pressed));
+
   _gtk_thread = std::thread(
     [this]()
     {
@@ -66,6 +70,19 @@ void Node::btn_start_pressed()
 void Node::btn_stop_pressed()
 {
   RCLCPP_INFO(get_logger(), "btn_stop_pressed");
+}
+
+void Node::btn_set_pressed()
+{
+  Gtk::Entry * entry_target_angle = nullptr;
+  _gtk_builder->get_widget("entry_target_angle", entry_target_angle);
+
+  std::stringstream angle_ss;
+  angle_ss << entry_target_angle->get_text().c_str();
+  float angle = 0.f;
+  angle_ss >> angle;
+
+  RCLCPP_INFO(get_logger(), "btn_set_pressed: angle = %0.2f", angle);
 }
 
 /**************************************************************************************
