@@ -53,6 +53,7 @@ private:
   std::thread _gtk_thread;
 
   void btn_start_pressed();
+  void btn_stop_pressed();
 };
 
 /**************************************************************************************

@@ -32,6 +32,10 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
   _gtk_builder->get_widget("btn_start", btn_start);
   btn_start->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
 
+  Gtk::Button * btn_stop = nullptr;
+  _gtk_builder->get_widget("btn_stop", btn_stop);
+  btn_stop->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_stop_pressed));
+
   _gtk_thread = std::thread(
     [this]()
     {
@@ -57,6 +61,11 @@ Node::~Node()
 void Node::btn_start_pressed()
 {
   RCLCPP_INFO(get_logger(), "btn_start_pressed");
+}
+
+void Node::btn_stop_pressed()
+{
+  RCLCPP_INFO(get_logger(), "btn_stop_pressed");
 }
 
 /**************************************************************************************
