@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <std_srvs/srv/empty.hpp>
+#include <robotem_rovne/srv/angular_target.hpp>
 
 #include <mp-units/systems/si/si.h>
 #include <mp-units/systems/angular/angular.h>
@@ -64,6 +65,10 @@ private:
   void request_stop();
 
   void btn_set_pressed();
+  rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedPtr _req_set_target_angle_service_client;
+  void init_req_set_target_angle_service_client();
+  void request_set_target_angle(float const target_angle_rad);
+
 };
 
 /**************************************************************************************

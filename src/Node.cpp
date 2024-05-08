@@ -32,6 +32,7 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
 
   init_req_start_service_client();
   init_req_stop_service_client();
+  init_req_set_target_angle_service_client();
 
   _gtk_thread = std::thread(
     [this]()
@@ -123,7 +124,24 @@ void Node::btn_set_pressed()
   float angle = 0.f;
   angle_ss >> angle;
 
-  RCLCPP_INFO(get_logger(), "btn_set_pressed: angle = %0.2f", angle);
+  RCLCPP_DEBUG(get_logger(), "btn_set_pressed: angle = %0.2f", angle);
+  request_set_target_angle(angle);
+}
+
+void Node::init_req_set_target_angle_service_client()
+{
+  _req_set_target_angle_service_client = create_client<robotem_rovne::srv::AngularTarget>("cmd_robot/set_angular_target");
+}
+
+void Node::request_set_target_angle(float const target_angle_rad)
+{
+  auto request = std::make_shared<robotem_rovne::srv::AngularTarget::Request>();
+  request->target_angle_rad = target_angle_rad;
+  auto onResponseCallback = [this](rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedFuture /* response */)
+  {
+    RCLCPP_INFO(get_logger(), "set target angle request sent and confirmed.");
+  };
+  auto future_response = _req_set_target_angle_service_client->async_send_request(request, onResponseCallback);
 }
 
 /**************************************************************************************
