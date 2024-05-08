@@ -45,7 +45,8 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
     {
       Gtk::Window * window = nullptr;
       _gtk_builder->get_widget("robotem_rovne_gui_window", window);
-      return _gtk_app->run(*window);
+      _gtk_app->run(*window);
+      rclcpp::shutdown();
     });
 
   RCLCPP_INFO(get_logger(), "%s init complete.", get_name());
