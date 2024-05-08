@@ -47,6 +47,7 @@ public:
   ~Node();
 
 private:
+  Glib::RefPtr<Gtk::Builder> _builder;
   std::thread _gui_thread;
 
   void btn_start_pressed();

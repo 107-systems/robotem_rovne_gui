@@ -28,11 +28,11 @@ Node::Node(int & argc, char ** argv)
     [this, &argc, &argv]()
     {
       auto app = Gtk::Application::create(argc, argv, "");
-      auto builder = Gtk::Builder::create();
+      auto _builder = Gtk::Builder::create();
 
       try
       {
-        builder->add_from_file("install/robotem_rovne_gui/share/robotem_rovne_gui/glade/robotem_rovne_gui.glade");
+        _builder->add_from_file("install/robotem_rovne_gui/share/robotem_rovne_gui/glade/robotem_rovne_gui.glade");
       }
       catch(const Glib::FileError& ex)
       {
@@ -50,8 +50,12 @@ Node::Node(int & argc, char ** argv)
         rclcpp::shutdown();
       }
 
+      Gtk::Button * btn_start = 0;
+      _builder->get_widget("btn_start", btn_start);
+      btn_start->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
+
       Gtk::Window * window = nullptr;
-      builder->get_widget("robotem_rovne_gui_window", window);
+      _builder->get_widget("robotem_rovne_gui_window", window);
       return app->run(*window);
     });
 
