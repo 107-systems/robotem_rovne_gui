@@ -16,38 +16,42 @@
  * MAIN
  **************************************************************************************/
 
-class GuiWindow : public Gtk::Window
-{
-public:
-  GuiWindow();
-};
-
-GuiWindow::GuiWindow()
-{
-  set_title("Robotem Rovne GUI");
-  set_default_size(320, 240);
-}
-
-int main(int argc, char ** argv)
+int main(int argc, char ** argv) try
 {
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<t07::Node>(argc, argv);
+  Glib::RefPtr<Gtk::Application> gtk_app = Gtk::Application::create(argc, argv, "");
+  Glib::RefPtr<Gtk::Builder> gtk_builder = Gtk::Builder::create();
+  gtk_builder->add_from_file("install/robotem_rovne_gui/share/robotem_rovne_gui/glade/robotem_rovne_gui.glade");
 
-  try
-  {
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return EXIT_SUCCESS;
-  }
-  catch (std::runtime_error const & err)
-  {
-    RCLCPP_ERROR(rclcpp::get_logger(node->get_name()), "Exception (std::runtime_error) caught: %s\nTerminating ...", err.what());
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    RCLCPP_ERROR(rclcpp::get_logger(node->get_name()), "Unhandled exception caught.\nTerminating ...");
-    return EXIT_FAILURE;
-  }
+  auto node = std::make_shared<t07::Node>(gtk_app, gtk_builder);
+
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return EXIT_SUCCESS;
+}
+catch (std::runtime_error const & err)
+{
+  RCLCPP_ERROR(rclcpp::get_logger(""), "Exception (std::runtime_error) caught: %s\nTerminating ...", err.what());
+  return EXIT_FAILURE;
+}
+catch(const Glib::FileError & err)
+{
+  RCLCPP_ERROR(rclcpp::get_logger(""), "Exception (Glib::FileError) caught: %s\nTerminating ...", err.what().c_str());
+  return EXIT_FAILURE;
+}
+catch(const Glib::MarkupError & err)
+{
+  RCLCPP_ERROR(rclcpp::get_logger(""), "Exception (Glib::MarkupError) caught: %s\nTerminating ...", err.what().c_str());
+  return EXIT_FAILURE;
+}
+catch(const Gtk::BuilderError & err)
+{
+  RCLCPP_ERROR(rclcpp::get_logger(""), "Exception (Gtk::BuilderError) caught: %s\nTerminating ...", err.what().c_str());
+  return EXIT_FAILURE;
+}
+catch (...)
+{
+  RCLCPP_ERROR(rclcpp::get_logger(""), "Unhandled exception caught.\nTerminating ...");
+  return EXIT_FAILURE;
 }

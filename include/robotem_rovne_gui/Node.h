@@ -43,12 +43,14 @@ namespace t07
 class Node : public rclcpp::Node
 {
 public:
-   Node(int & argc, char ** argv);
+   Node(Glib::RefPtr<Gtk::Application> gtk_app,
+        Glib::RefPtr<Gtk::Builder> gtk_builder);
   ~Node();
 
 private:
-  Glib::RefPtr<Gtk::Builder> _builder;
-  std::thread _gui_thread;
+  Glib::RefPtr<Gtk::Application> _gtk_app;
+  Glib::RefPtr<Gtk::Builder> _gtk_builder;
+  std::thread _gtk_thread;
 
   void btn_start_pressed();
 };

@@ -21,42 +21,23 @@ namespace t07
  * CTOR/DTOR
  **************************************************************************************/
 
-Node::Node(int & argc, char ** argv)
+Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
+           Glib::RefPtr<Gtk::Builder> gtk_builder)
 : rclcpp::Node("robotem_rovne_gui_node")
+, _gtk_app{gtk_app}
+, _gtk_builder{gtk_builder}
+, _gtk_thread{}
 {
-  _gui_thread = std::thread(
-    [this, &argc, &argv]()
+  Gtk::Button * btn_start = nullptr;
+  _gtk_builder->get_widget("btn_start", btn_start);
+  btn_start->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
+
+  _gtk_thread = std::thread(
+    [this]()
     {
-      auto app = Gtk::Application::create(argc, argv, "");
-      auto _builder = Gtk::Builder::create();
-
-      try
-      {
-        _builder->add_from_file("install/robotem_rovne_gui/share/robotem_rovne_gui/glade/robotem_rovne_gui.glade");
-      }
-      catch(const Glib::FileError& ex)
-      {
-        RCLCPP_ERROR(get_logger(), "FileError: %s", ex.what().c_str());
-        rclcpp::shutdown();
-      }
-      catch(const Glib::MarkupError& ex)
-      {
-        RCLCPP_ERROR(get_logger(), "MarkupError: %s", ex.what().c_str());
-        rclcpp::shutdown();
-      }
-      catch(const Gtk::BuilderError& ex)
-      {
-        RCLCPP_ERROR(get_logger(), "BuilderError: %s", ex.what().c_str());
-        rclcpp::shutdown();
-      }
-
-      Gtk::Button * btn_start = 0;
-      _builder->get_widget("btn_start", btn_start);
-      btn_start->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_start_pressed));
-
       Gtk::Window * window = nullptr;
-      _builder->get_widget("robotem_rovne_gui_window", window);
-      return app->run(*window);
+      _gtk_builder->get_widget("robotem_rovne_gui_window", window);
+      return _gtk_app->run(*window);
     });
 
   RCLCPP_INFO(get_logger(), "%s init complete.", get_name());
@@ -64,7 +45,8 @@ Node::Node(int & argc, char ** argv)
 
 Node::~Node()
 {
-  _gui_thread.join();
+  _gtk_app->quit();
+  _gtk_thread.join();
   RCLCPP_INFO(get_logger(), "%s shut down successfully.", get_name());
 }
 
