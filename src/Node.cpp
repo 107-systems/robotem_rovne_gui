@@ -85,7 +85,7 @@ void Node::gtk_on_notification_from_worker_thread()
   char yaw_actual_buf[32] = {0};
   {
     std::lock_guard<std::mutex> lock(_yaw_mtx);
-    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "%0.2f", _yaw_actual);
+    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "Yaw = %0.2f", _yaw_actual * 180.f / M_PI);
   }
 
   Gtk::Label * label_yaw_actual = nullptr;
@@ -141,13 +141,13 @@ void Node::btn_set_pressed()
   Gtk::Entry * entry_yaw_target = nullptr;
   _gtk_builder->get_widget("entry_yaw_target", entry_yaw_target);
 
-  std::stringstream angle_ss;
-  angle_ss << entry_yaw_target->get_text().c_str();
-  float angle = 0.f;
-  angle_ss >> angle;
+  std::stringstream angle_deg_ss;
+  angle_deg_ss << entry_yaw_target->get_text().c_str();
+  float angle_deg = 0.f;
+  angle_deg_ss >> angle_deg;
 
-  RCLCPP_DEBUG(get_logger(), "btn_set_pressed: angle = %0.2f", angle);
-  request_set_target_angle(angle);
+  RCLCPP_DEBUG(get_logger(), "btn_set_pressed: angle = %0.2f", angle_deg);
+  request_set_target_angle(angle_deg * M_PI / 180.f);
 }
 
 void Node::init_req_set_target_angle_service_client()
