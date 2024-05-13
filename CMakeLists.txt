@@ -13,6 +13,8 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(robotem_rovne REQUIRED)
 find_package(mp-units REQUIRED)
 #######################################################################################
@@ -47,7 +49,7 @@ target_link_libraries(${ROBOTEM_ROVNE_GUI_TARGET}
         ${GTKMM_LIBRARIES}
 )
 #######################################################################################
-ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs std_srvs sensor_msgs)
+ament_target_dependencies(${ROBOTEM_ROVNE_GUI_TARGET} rclcpp std_msgs std_srvs sensor_msgs tf2 tf2_geometry_msgs)
 #######################################################################################
 install(TARGETS ${ROBOTEM_ROVNE_GUI_TARGET} DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY glade DESTINATION share/${PROJECT_NAME})

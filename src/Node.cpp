@@ -10,6 +10,9 @@
 
 #include <robotem_rovne_gui/Node.h>
 
+#include <tf2/utils.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
@@ -183,8 +186,11 @@ void Node::init_imu_sub()
     _imu_qos_profile,
     [this](sensor_msgs::msg::Imu::SharedPtr const msg)
     {
+      double const heading_actual = tf2::getYaw(msg->orientation);
+
       RCLCPP_INFO(get_logger(),
-                  "IMU Pose (x,y,z,w): %0.2f %0.2f %0.2f %0.2f",
+                  "IMU Pose (theta) | (x,y,z,w): %0.2f | %0.2f %0.2f %0.2f %0.2f",
+                  heading_actual,
                   msg->orientation.x,
                   msg->orientation.y,
                   msg->orientation.z,
@@ -195,7 +201,7 @@ void Node::init_imu_sub()
       assert(label_heading_actual);
 
       char heading_actual_buf[32] = {0};
-      snprintf(heading_actual_buf, sizeof(heading_actual_buf), "%0.2f", msg->orientation.z);
+      snprintf(heading_actual_buf, sizeof(heading_actual_buf), "%0.2f", heading_actual);
       label_heading_actual->set_label(std::string(heading_actual_buf));
     },
     _imu_sub_options);
