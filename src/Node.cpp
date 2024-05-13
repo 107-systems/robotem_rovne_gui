@@ -209,7 +209,7 @@ void Node::init_imu_sub()
 
       _gtk_dispatcher.emit();
 
-      RCLCPP_INFO(get_logger(),
+      RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 1000UL,
                   "IMU Pose (theta) | (x,y,z,w): %0.2f | %0.2f %0.2f %0.2f %0.2f",
                   _yaw_actual,
                   msg->orientation.x,
