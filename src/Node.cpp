@@ -27,12 +27,15 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
 , _gtk_app{gtk_app}
 , _gtk_builder{gtk_builder}
 , _gtk_thread{}
+, _imu_qos_profile{rclcpp::KeepLast(10), rmw_qos_profile_sensor_data}
 {
   init_gtk();
 
   init_req_start_service_client();
   init_req_stop_service_client();
   init_req_set_target_angle_service_client();
+
+  init_imu_sub();
 
   _gtk_thread = std::thread(
     [this]()
@@ -142,6 +145,60 @@ void Node::request_set_target_angle(float const target_angle_rad)
     RCLCPP_INFO(get_logger(), "set target angle request sent and confirmed.");
   };
   auto future_response = _req_set_target_angle_service_client->async_send_request(request, onResponseCallback);
+}
+
+void Node::init_imu_sub()
+{
+  auto const imu_topic = std::string("imu");
+  auto const imu_topic_deadline = std::chrono::milliseconds(100);
+  auto const imu_topic_liveliness_lease_duration = std::chrono::milliseconds(1000);
+
+  _imu_qos_profile.deadline(imu_topic_deadline);
+  _imu_qos_profile.liveliness(RMW_QOS_POLICY_LIVELINESS_MANUAL_BY_TOPIC);
+  _imu_qos_profile.liveliness_lease_duration(imu_topic_liveliness_lease_duration);
+
+  _imu_sub_options.event_callbacks.deadline_callback =
+    [this, imu_topic](rclcpp::QOSDeadlineRequestedInfo & event) -> void
+    {
+      RCLCPP_ERROR_THROTTLE(get_logger(), *get_clock(), 5*1000UL,
+                            "deadline missed for \"%s\" (total_count: %d, total_count_change: %d).",
+                            imu_topic.c_str(), event.total_count, event.total_count_change);
+    };
+
+  _imu_sub_options.event_callbacks.liveliness_callback =
+    [this, imu_topic](rclcpp::QOSLivelinessChangedInfo & event) -> void
+    {
+      if (event.alive_count > 0)
+      {
+        RCLCPP_INFO(get_logger(), "liveliness gained for \"%s\"", imu_topic.c_str());
+      }
+      else
+      {
+        RCLCPP_WARN(get_logger(), "liveliness lost for \"%s\"", imu_topic.c_str());
+      }
+    };
+
+  _imu_sub = create_subscription<sensor_msgs::msg::Imu>(
+    imu_topic,
+    _imu_qos_profile,
+    [this](sensor_msgs::msg::Imu::SharedPtr const msg)
+    {
+      RCLCPP_INFO(get_logger(),
+                  "IMU Pose (x,y,z,w): %0.2f %0.2f %0.2f %0.2f",
+                  msg->orientation.x,
+                  msg->orientation.y,
+                  msg->orientation.z,
+                  msg->orientation.w);
+
+      Gtk::Label * label_heading_actual = nullptr;
+      _gtk_builder->get_widget("label_heading_actual", label_heading_actual);
+      assert(label_heading_actual);
+
+      char heading_actual_buf[32] = {0};
+      snprintf(heading_actual_buf, sizeof(heading_actual_buf), "%0.2f", msg->orientation.z);
+      label_heading_actual->set_label(std::string(heading_actual_buf));
+    },
+    _imu_sub_options);
 }
 
 /**************************************************************************************

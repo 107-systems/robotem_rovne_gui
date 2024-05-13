@@ -18,6 +18,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <std_srvs/srv/empty.hpp>
+#include <sensor_msgs/msg/imu.hpp>
 #include <robotem_rovne/srv/angular_target.hpp>
 
 #include <mp-units/systems/si/si.h>
@@ -69,6 +70,10 @@ private:
   void init_req_set_target_angle_service_client();
   void request_set_target_angle(float const target_angle_rad);
 
+  rclcpp::QoS _imu_qos_profile;
+  rclcpp::SubscriptionOptions _imu_sub_options;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr _imu_sub;
+  void init_imu_sub();
 };
 
 /**************************************************************************************
