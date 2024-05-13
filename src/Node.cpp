@@ -85,7 +85,7 @@ void Node::gtk_on_notification_from_worker_thread()
   char yaw_actual_buf[32] = {0};
   {
     std::lock_guard<std::mutex> lock(_yaw_mtx);
-    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "Yaw = %0.2f", _yaw_actual * 180.f / M_PI);
+    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "Yaw = %0.2f", _yaw_actual.numerical_value_in(deg));
   }
 
   Gtk::Label * label_yaw_actual = nullptr;
@@ -146,8 +146,10 @@ void Node::btn_set_pressed()
   float angle_deg = 0.f;
   angle_deg_ss >> angle_deg;
 
-  RCLCPP_DEBUG(get_logger(), "btn_set_pressed: angle = %0.2f", angle_deg);
-  request_set_target_angle(angle_deg * M_PI / 180.f);
+  auto const yaw_target = (angle_deg * deg).in(rad);
+
+  RCLCPP_DEBUG(get_logger(), "btn_set_pressed: angle = %0.2f", yaw_target.numerical_value_in(deg));
+  request_set_target_angle(yaw_target);
 }
 
 void Node::init_req_set_target_angle_service_client()
@@ -155,10 +157,10 @@ void Node::init_req_set_target_angle_service_client()
   _req_set_target_angle_service_client = create_client<robotem_rovne::srv::AngularTarget>("cmd_robot/set_angular_target");
 }
 
-void Node::request_set_target_angle(float const target_angle_rad)
+void Node::request_set_target_angle(quantity<rad> const yaw_target)
 {
   auto request = std::make_shared<robotem_rovne::srv::AngularTarget::Request>();
-  request->target_angle_rad = target_angle_rad;
+  request->target_angle_rad = yaw_target.numerical_value_in(rad);
   auto onResponseCallback = [this](rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedFuture /* response */)
   {
     RCLCPP_INFO(get_logger(), "set target angle request sent and confirmed.");
@@ -204,14 +206,14 @@ void Node::init_imu_sub()
     {
       {
         std::lock_guard<std::mutex> lock(_yaw_mtx);
-        _yaw_actual = static_cast<double>(tf2::getYaw(msg->orientation));
+        _yaw_actual = static_cast<double>(tf2::getYaw(msg->orientation)) * rad;
       }
 
       _gtk_dispatcher.emit();
 
       RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 1000UL,
                   "IMU Pose (theta) | (x,y,z,w): %0.2f | %0.2f %0.2f %0.2f %0.2f",
-                  _yaw_actual,
+                  _yaw_actual.numerical_value_in(deg),
                   msg->orientation.x,
                   msg->orientation.y,
                   msg->orientation.z,

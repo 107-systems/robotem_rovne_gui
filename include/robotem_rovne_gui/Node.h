@@ -29,9 +29,6 @@
  **************************************************************************************/
 
 using namespace mp_units;
-using mp_units::si::unit_symbols::m;
-using mp_units::si::unit_symbols::mm;
-using mp_units::si::unit_symbols::s;
 using mp_units::angular::unit_symbols::deg;
 using mp_units::angular::unit_symbols::rad;
 
@@ -70,13 +67,13 @@ private:
   void btn_set_pressed();
   rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedPtr _req_set_target_angle_service_client;
   void init_req_set_target_angle_service_client();
-  void request_set_target_angle(float const target_angle_rad);
+  void request_set_target_angle(quantity<rad> const yaw_target);
 
   rclcpp::QoS _imu_qos_profile;
   rclcpp::SubscriptionOptions _imu_sub_options;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr _imu_sub;
   std::mutex _yaw_mtx;
-  double _yaw_actual;
+  quantity<rad> _yaw_actual;
   void init_imu_sub();
 };
 
