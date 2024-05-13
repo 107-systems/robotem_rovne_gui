@@ -98,7 +98,7 @@
                     <property name="row-homogeneous">True</property>
                     <property name="column-homogeneous">True</property>
                     <child>
-                      <object class="GtkEntry" id="entry_target_angle">
+                      <object class="GtkEntry" id="entry_yaw_target">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="placeholder-text" translatable="yes">0.0</property>
@@ -154,7 +154,7 @@
                 <property name="can-focus">False</property>
                 <property name="left-padding">12</property>
                 <child>
-                  <object class="GtkLabel" id="label_heading_actual">
+                  <object class="GtkLabel" id="label_yaw_actual">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="ypad">5</property>

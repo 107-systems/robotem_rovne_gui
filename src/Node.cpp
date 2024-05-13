@@ -88,10 +88,10 @@ void Node::gtk_on_notification_from_worker_thread()
     snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "%0.2f", _yaw_actual);
   }
 
-  Gtk::Label * label_heading_actual = nullptr;
-  _gtk_builder->get_widget("label_heading_actual", label_heading_actual);
-  assert(label_heading_actual);
-  label_heading_actual->set_label(std::string(yaw_actual_buf));
+  Gtk::Label * label_yaw_actual = nullptr;
+  _gtk_builder->get_widget("label_yaw_actual", label_yaw_actual);
+  assert(label_yaw_actual);
+  label_yaw_actual->set_label(std::string(yaw_actual_buf));
 }
 
 void Node::btn_start_pressed()
@@ -138,11 +138,11 @@ void Node::request_stop()
 
 void Node::btn_set_pressed()
 {
-  Gtk::Entry * entry_target_angle = nullptr;
-  _gtk_builder->get_widget("entry_target_angle", entry_target_angle);
+  Gtk::Entry * entry_yaw_target = nullptr;
+  _gtk_builder->get_widget("entry_yaw_target", entry_yaw_target);
 
   std::stringstream angle_ss;
-  angle_ss << entry_target_angle->get_text().c_str();
+  angle_ss << entry_yaw_target->get_text().c_str();
   float angle = 0.f;
   angle_ss >> angle;
 
