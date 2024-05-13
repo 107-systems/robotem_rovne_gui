@@ -52,8 +52,10 @@ public:
 private:
   Glib::RefPtr<Gtk::Application> _gtk_app;
   Glib::RefPtr<Gtk::Builder> _gtk_builder;
+  Glib::Dispatcher _gtk_dispatcher;
   std::thread _gtk_thread;
   void init_gtk();
+  void gtk_on_notification_from_worker_thread();
 
   void btn_start_pressed();
   rclcpp::Client<std_srvs::srv::Empty>::SharedPtr _req_start_service_client;
@@ -73,6 +75,8 @@ private:
   rclcpp::QoS _imu_qos_profile;
   rclcpp::SubscriptionOptions _imu_sub_options;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr _imu_sub;
+  std::mutex _yaw_mtx;
+  double _yaw_actual;
   void init_imu_sub();
 };
 

@@ -76,6 +76,22 @@ void Node::init_gtk()
   Gtk::Button * btn_set = nullptr;
   _gtk_builder->get_widget("btn_set", btn_set);
   btn_set->signal_clicked().connect(sigc::mem_fun(*this, &Node::btn_set_pressed));
+
+  _gtk_dispatcher.connect(sigc::mem_fun(*this, &Node::gtk_on_notification_from_worker_thread));
+}
+
+void Node::gtk_on_notification_from_worker_thread()
+{
+  char yaw_actual_buf[32] = {0};
+  {
+    std::lock_guard<std::mutex> lock(_yaw_mtx);
+    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "%0.2f", _yaw_actual);
+  }
+
+  Gtk::Label * label_heading_actual = nullptr;
+  _gtk_builder->get_widget("label_heading_actual", label_heading_actual);
+  assert(label_heading_actual);
+  label_heading_actual->set_label(std::string(yaw_actual_buf));
 }
 
 void Node::btn_start_pressed()
@@ -186,23 +202,20 @@ void Node::init_imu_sub()
     _imu_qos_profile,
     [this](sensor_msgs::msg::Imu::SharedPtr const msg)
     {
-      double const heading_actual = tf2::getYaw(msg->orientation);
+      {
+        std::lock_guard<std::mutex> lock(_yaw_mtx);
+        _yaw_actual = static_cast<double>(tf2::getYaw(msg->orientation));
+      }
+
+      _gtk_dispatcher.emit();
 
       RCLCPP_INFO(get_logger(),
                   "IMU Pose (theta) | (x,y,z,w): %0.2f | %0.2f %0.2f %0.2f %0.2f",
-                  heading_actual,
+                  _yaw_actual,
                   msg->orientation.x,
                   msg->orientation.y,
                   msg->orientation.z,
                   msg->orientation.w);
-
-      Gtk::Label * label_heading_actual = nullptr;
-      _gtk_builder->get_widget("label_heading_actual", label_heading_actual);
-      assert(label_heading_actual);
-
-      char heading_actual_buf[32] = {0};
-      snprintf(heading_actual_buf, sizeof(heading_actual_buf), "%0.2f", heading_actual);
-      label_heading_actual->set_label(std::string(heading_actual_buf));
     },
     _imu_sub_options);
 }
