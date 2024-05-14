@@ -48,6 +48,11 @@ jobs:
       with:
         path: 'ros2_ws/src/robotem_rovne_gui'
 
+    - uses: actions/checkout@v4
+      with:
+        repository: '107-systems/robotem_rovne'
+        path: 'ros2_ws/src/robotem_rovne'
+
     - name: colcon build
       run: |
         source /opt/ros/${{ matrix.ros_distro }}/setup.bash
