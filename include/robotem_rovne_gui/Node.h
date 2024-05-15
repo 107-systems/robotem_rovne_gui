@@ -68,6 +68,7 @@ private:
   rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedPtr _req_set_target_angle_service_client;
   void init_req_set_target_angle_service_client();
   void request_set_target_angle(quantity<rad> const yaw_target);
+  std::optional<quantity<rad>> _yaw_target;
 
   rclcpp::QoS _imu_qos_profile;
   rclcpp::SubscriptionOptions _imu_sub_options;

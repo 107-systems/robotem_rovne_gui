@@ -30,6 +30,7 @@ Node::Node(Glib::RefPtr<Gtk::Application> gtk_app,
 , _gtk_app{gtk_app}
 , _gtk_builder{gtk_builder}
 , _gtk_thread{}
+, _yaw_target{std::nullopt}
 , _imu_qos_profile{rclcpp::KeepLast(10), rmw_qos_profile_sensor_data}
 {
   init_gtk();
@@ -82,10 +83,14 @@ void Node::init_gtk()
 
 void Node::gtk_on_notification_from_worker_thread()
 {
-  char yaw_actual_buf[32] = {0};
+  char yaw_actual_buf[64] = {0};
   {
     std::lock_guard<std::mutex> lock(_yaw_mtx);
-    snprintf(yaw_actual_buf, sizeof(yaw_actual_buf), "Yaw = %0.2f", _yaw_actual.numerical_value_in(deg));
+    snprintf(yaw_actual_buf,
+             sizeof(yaw_actual_buf),
+             "Yaw: actual = %0.2f, target = %0.2f",
+             _yaw_actual.numerical_value_in(deg),
+             _yaw_target.has_value() ? _yaw_target.value().numerical_value_in(deg) : std::numeric_limits<double>::infinity());
   }
 
   Gtk::Label * label_yaw_actual = nullptr;
@@ -102,7 +107,7 @@ void Node::btn_start_pressed()
 
 void Node::init_req_start_service_client()
 {
-  _req_start_service_client = create_client<std_srvs::srv::Empty>("cmd_robot/start");
+  _req_start_service_client = create_client<std_srvs::srv::Empty>("/t07/cmd_robot/start");
 }
 
 void Node::request_start()
@@ -123,7 +128,7 @@ void Node::btn_stop_pressed()
 
 void Node::init_req_stop_service_client()
 {
-  _req_stop_service_client = create_client<std_srvs::srv::Empty>("cmd_robot/stop");
+  _req_stop_service_client = create_client<std_srvs::srv::Empty>("/t07/cmd_robot/stop");
 }
 
 void Node::request_stop()
@@ -154,16 +159,17 @@ void Node::btn_set_pressed()
 
 void Node::init_req_set_target_angle_service_client()
 {
-  _req_set_target_angle_service_client = create_client<robotem_rovne::srv::AngularTarget>("cmd_robot/set_angular_target");
+  _req_set_target_angle_service_client = create_client<robotem_rovne::srv::AngularTarget>("/t07/cmd_robot/set_angular_target");
 }
 
 void Node::request_set_target_angle(quantity<rad> const yaw_target)
 {
   auto request = std::make_shared<robotem_rovne::srv::AngularTarget::Request>();
   request->target_angle_rad = yaw_target.numerical_value_in(rad);
-  auto onResponseCallback = [this](rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedFuture /* response */)
+  auto onResponseCallback = [this, yaw_target](rclcpp::Client<robotem_rovne::srv::AngularTarget>::SharedFuture /* response */)
   {
     RCLCPP_INFO(get_logger(), "set target angle request sent and confirmed.");
+    _yaw_target = yaw_target;
   };
   auto future_response = _req_set_target_angle_service_client->async_send_request(request, onResponseCallback);
 }
