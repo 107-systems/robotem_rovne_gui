@@ -52,6 +52,8 @@ jobs:
       with:
         repository: '107-systems/robotem_rovne'
         path: 'ros2_ws/src/robotem_rovne'
+        submodules: true
+        fetch-depth: 1
 
     - name: colcon build
       run: |
